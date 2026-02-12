@@ -1,0 +1,372 @@
+// This is your Prisma schema file for SQLite
+// Enums are replaced with String types for SQLite compatibility
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Business Model
+model Business {
+  id            String   @id @default(uuid())
+  name          String
+  industry      String?
+  logo          String?
+  email         String   @unique
+  phone         String?
+  timezone      String   @default("UTC")
+  
+  // Operating hours (stored as JSON string for SQLite)
+  operatingHours String?
+  
+  // Onboarding status
+  onboardingComplete Boolean @default(false)
+  onboardingStep     Int     @default(0) // 0: Account, 1: Comm, 2: Form, 3: Availability, 4: Compliance
+  
+  // Integration credentials (stored as JSON strings)
+  emailConfig   String?
+  smsConfig     String?
+  whatsappConfig String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  users         User[]
+  services      Service[]
+  leads         Lead[]
+  bookings      Booking[]
+  forms         Form[]
+  inventoryItems InventoryItem[]
+  messages      Message[]
+  conversations Conversation[]
+  automations   Automation[]
+  
+  @@map("businesses")
+}
+
+// User Model (Owner or Staff)
+model User {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  email         String   @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          String   @default("STAFF") // "OWNER" or "STAFF"
+  permissions   String?  // JSON string: ["leads", "bookings", "inventory", "messages"]
+  
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignedLeads Lead[]   @relation("AssignedTo")
+  assignedBookings Booking[] @relation("AssignedTo")
+  sentMessages  Message[] @relation("SentBy")
+  
+  @@map("users")
+}
+
+// Service Model
+model Service {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  name          String
+  description   String?
+  duration      Int      // Duration in minutes
+  price         Float?
+  isActive      Boolean  @default(true)
+  
+  // Resources required
+  requiresStaff Boolean  @default(true)
+  maxCapacity   Int      @default(1)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+  inventoryUsage ServiceInventory[]
+  
+  @@map("services")
+}
+
+// Lead Model
+model Lead {
+  id            String      @id @default(uuid())
+  businessId    String
+  assignedToId  String?
+  
+  // Contact info
+  firstName     String?
+  lastName      String?
+  email         String?
+  phone         String?
+  
+  // Lead details
+  message       String?
+  source        String?     // "web", "email", "sms", "whatsapp"
+  serviceInterest String?
+  
+  // AI scoring
+  score         Float       @default(0)
+  urgency       String      @default("WARM") // "HOT", "WARM", "COLD"
+  estimatedValue Float?
+  
+  // Status
+  status        String      @default("NEW") // "NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "LOST"
+  convertedToBookingId String?
+  
+  // Timestamps
+  contactedAt   DateTime?
+  qualifiedAt   DateTime?
+  convertedAt   DateTime?
+  lostAt        DateTime?
+  lastActivityAt DateTime   @default(now())
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignedTo    User?    @relation("AssignedTo", fields: [assignedToId], references: [id])
+  
+  @@map("leads")
+}
+
+// Booking Model
+model Booking {
+  id            String         @id @default(uuid())
+  businessId    String
+  serviceId     String
+  assignedToId  String?
+  
+  // Customer info (no authentication)
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  
+  // Booking details
+  startTime     DateTime
+  endTime       DateTime
+  status        String  @default("PENDING") // "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "NO_SHOW"
+  notes         String?
+  
+  // Notifications sent
+  confirmationSent Boolean @default(false)
+  reminderSent     Boolean @default(false)
+  followUpSent     Boolean @default(false)
+  
+  // Form tracking
+  formSent         Boolean @default(false)
+  formCompletedAt  DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  service       Service  @relation(fields: [serviceId], references: [id])
+  assignedTo    User?    @relation("AssignedTo", fields: [assignedToId], references: [id])
+  formSubmissions FormSubmission[]
+  
+  @@map("bookings")
+}
+
+// Form Builder Model
+model Form {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  name          String
+  description   String?
+  
+  // Form definition (JSON string for SQLite)
+  fields        String     // Array of field definitions as JSON string
+  
+  isActive      Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  submissions   FormSubmission[]
+  
+  @@map("forms")
+}
+
+// Form Submission Model
+model FormSubmission {
+  id            String      @id @default(uuid())
+  formId        String
+  bookingId     String?
+  
+  // Customer info (if not linked to booking)
+  customerName  String?
+  customerEmail String?
+  
+  // Submission data (JSON string for SQLite)
+  data          String        // Key-value pairs of responses as JSON string
+  status        String  @default("PENDING") // "PENDING", "COMPLETED", "PARTIALLY_COMPLETED"
+  
+  // Tracking
+  startedAt     DateTime    @default(now())
+  completedAt   DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  form          Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  booking       Booking? @relation(fields: [bookingId], references: [id])
+  
+  @@map("form_submissions")
+}
+
+// Inventory Model
+model InventoryItem {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  name          String
+  description   String?
+  currentStock  Int
+  minStock      Int      @default(0)
+  unit          String   // "pieces", "bottles", "kg", etc.
+  
+  // Vendor restock info
+  vendorName    String?
+  vendorEmail   String?
+  
+  // Alerts
+  lowStockAlert Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  serviceUsage  ServiceInventory[]
+  
+  @@map("inventory_items")
+}
+
+// Service-Inventory Junction
+model ServiceInventory {
+  id            String   @id @default(uuid())
+  serviceId     String
+  inventoryId   String
+  quantityUsed  Int
+  
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  service       Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  inventory     InventoryItem @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  
+  @@map("service_inventory")
+}
+
+// Conversation Model
+model Conversation {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  // Contact info
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  
+  // State
+  isAutomationPaused Boolean @default(false)
+  lastMessageAt   DateTime @default(now())
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  
+  @@map("conversations")
+}
+
+// Message Model
+model Message {
+  id            String           @id @default(uuid())
+  businessId    String
+  sentById      String?
+  conversationId String?
+  
+  // Recipient
+  recipientName  String?
+  recipientEmail String?
+  recipientPhone String?
+  
+  // Message content
+  channel       String // "EMAIL", "SMS", "WHATSAPP"
+  direction     String // "INBOUND", "OUTBOUND"
+  subject       String?
+  body          String
+  
+  // Status
+  sent          Boolean   @default(false)
+  delivered     Boolean   @default(false)
+  read          Boolean   @default(false)
+  failed        Boolean   @default(false)
+  errorMessage  String?
+  
+  // External IDs
+  externalId    String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sentBy        User?    @relation("SentBy", fields: [sentById], references: [id])
+  conversation  Conversation? @relation(fields: [conversationId], references: [id])
+  
+  @@map("messages")
+}
+
+// Automation Model
+model Automation {
+  id            String   @id @default(uuid())
+  businessId    String
+  
+  name          String
+  description   String?
+  
+  // Trigger configuration (JSON strings for SQLite)
+  triggerType   String
+  triggerConfig String?
+  
+  // Action configuration (JSON string for SQLite)
+  actionType    String
+  actionConfig  String
+  
+  delay         Int      @default(0)
+  
+  isActive      Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@map("automations")
+}

@@ -1,0 +1,28 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# environment variables
+.env
+.env.test
+.env.production
+
+# prisma
+/prisma/*.db-journal
+
+# build
+dist
+build
+
+# misc
+.DS_Store
+.vscode
+.idea
