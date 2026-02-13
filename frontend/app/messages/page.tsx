@@ -8,8 +8,9 @@ import { formatDistanceToNow, format } from 'date-fns';
 import Link from 'next/link';
 
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function InboxPage() {
+function InboxContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const targetId = searchParams.get('id');
@@ -349,6 +350,18 @@ export default function InboxPage() {
                 }
             `}</style>
         </div>
+    );
+}
+
+export default function InboxPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+        }>
+            <InboxContent />
+        </Suspense>
     );
 }
 
