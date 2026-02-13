@@ -9,6 +9,7 @@
 ## 👨‍💻 Author
 **Spandan Gowda B C**
 *Full-Stack Developer & CareOps Innovator*
+[GitHub Profile](https://github.com/SpandanGowdaBC)
 
 ---
 
