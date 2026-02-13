@@ -185,7 +185,91 @@ async function seedZenCare() {
             ]
         });
 
-        // 9. Mark Onboarding as Complete
+        // 9. Create 3 Professional Forms for the Documentation Hub
+        console.log("📝 Creating Forms and Submissions...");
+        const intakeForm = await prisma.form.create({
+            data: {
+                businessId,
+                name: 'Patient Intake & Medical History',
+                description: 'Initial assessment form for all new ZenCare patients.',
+                fields: JSON.stringify([
+                    { id: 'fullName', label: 'Full Name', type: 'text', required: true },
+                    { id: 'dob', label: 'Date of Birth', type: 'date', required: true },
+                    { id: 'allergies', label: 'Known Allergies', type: 'textarea', required: false },
+                    { id: 'medications', label: 'Current Medications', type: 'textarea', required: true }
+                ])
+            }
+        });
+
+        const consentForm = await prisma.form.create({
+            data: {
+                businessId,
+                name: 'HIPAA & Privacy Consent',
+                description: 'Mandatory privacy agreement and data protection consent.',
+                fields: JSON.stringify([
+                    { id: 'agreed', label: 'I agree to the terms', type: 'checkbox', required: true },
+                    { id: 'signature', label: 'Digital Signature', type: 'text', required: true }
+                ])
+            }
+        });
+
+        const feedbackForm = await prisma.form.create({
+            data: {
+                businessId,
+                name: 'Post-Op Experience Survey',
+                description: 'Service quality feedback form for post-recovery monitoring.',
+                fields: JSON.stringify([
+                    { id: 'rating', label: 'How would you rate your recovery?', type: 'number', required: true },
+                    { id: 'comments', label: 'Additional Comments', type: 'textarea', required: false }
+                ])
+            }
+        });
+
+        // 10. Create 5 Form Submissions (Mixture of Completed and Pending)
+        await prisma.formSubmission.createMany({
+            data: [
+                {
+                    formId: intakeForm.id,
+                    customerName: 'Eleanor Vance',
+                    customerEmail: 'e.vance@gmail.com',
+                    data: JSON.stringify({ fullName: 'Eleanor Vance', dob: '1985-06-12', medications: 'None' }),
+                    status: 'COMPLETED',
+                    completedAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                },
+                {
+                    formId: consentForm.id,
+                    customerName: 'Eleanor Vance',
+                    customerEmail: 'e.vance@gmail.com',
+                    data: JSON.stringify({ agreed: true, signature: 'E. Vance' }),
+                    status: 'COMPLETED',
+                    completedAt: new Date(Date.now() - 23 * 60 * 60 * 1000)
+                },
+                {
+                    formId: intakeForm.id,
+                    customerName: 'Julian Dixon',
+                    customerEmail: 'julian.d@fastmail.com',
+                    data: '{}',
+                    status: 'PENDING'
+                },
+                {
+                    formId: feedbackForm.id,
+                    customerName: 'George Banks',
+                    customerEmail: 'gbanks@company.com',
+                    data: JSON.stringify({ rating: 5, comments: 'Alex was amazing, very professional.' }),
+                    status: 'COMPLETED',
+                    completedAt: new Date()
+                },
+                {
+                    formId: intakeForm.id,
+                    customerName: 'Catherine Hale',
+                    customerEmail: 'chale@techmail.com',
+                    data: '{}',
+                    status: 'PENDING'
+                }
+            ]
+        });
+
+        // 11. Mark Onboarding as Complete
         await prisma.business.update({
             where: { id: businessId },
             data: { onboardingComplete: true }
