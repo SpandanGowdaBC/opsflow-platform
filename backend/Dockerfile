@@ -1,4 +1,7 @@
-FROM node:18-alpine
+FROM node:18-slim
+
+# Install OpenSSL 1.1 dependency for Prisma
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
@@ -7,9 +10,9 @@ RUN npm install
 
 COPY . .
 
-# We skip prisma generate here because it will be run in the container context
-# or handled by volumes during dev
+# Ensure Prisma client is generated for the current OS
+RUN npx prisma generate
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npx prisma generate && node server.js"]
+CMD ["node", "server.js"]
