@@ -5,10 +5,24 @@ const { verifyToken } = require('../middleware/auth.middleware');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Simple in-memory cache for dashboard stats (5-10 second TTL)
+let dashboardCache = {
+    data: null,
+    timestamp: 0,
+    businessId: null
+};
+
 // Get dashboard data - The "What is happening right now?" view
 router.get('/', verifyToken, async (req, res) => {
     try {
         const businessId = req.businessId;
+
+        // Check cache (10 second refresh)
+        if (dashboardCache.data &&
+            dashboardCache.businessId === businessId &&
+            (Date.now() - dashboardCache.timestamp < 10000)) {
+            return res.json(dashboardCache.data);
+        }
 
         // 1. Get counts for the KPI cards
         const [
@@ -158,7 +172,7 @@ router.get('/', verifyToken, async (req, res) => {
 
         // Handled above with lowStockCount and lowStockItems filtering
 
-        res.json({
+        const responseData = {
             stats: {
                 activeLeads: leadsCount,
                 upcomingBookings: upcomingBookingsCount,
@@ -176,7 +190,16 @@ router.get('/', verifyToken, async (req, res) => {
             todaysBookings,
             activities,
             lowStockItems
-        });
+        };
+
+        // Update Cache
+        dashboardCache = {
+            data: responseData,
+            timestamp: Date.now(),
+            businessId: businessId
+        };
+
+        res.json(responseData);
 
     } catch (error) {
         console.error('Dashboard error:', error);

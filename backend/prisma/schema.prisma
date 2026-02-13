@@ -143,6 +143,8 @@ model Lead {
   assignedTo    User?    @relation("AssignedTo", fields: [assignedToId], references: [id])
   
   @@map("leads")
+  @@index([businessId])
+  @@index([status])
 }
 
 // Booking Model
@@ -182,6 +184,9 @@ model Booking {
   formSubmissions FormSubmission[]
   
   @@map("bookings")
+  @@index([businessId])
+  @@index([status])
+  @@index([startTime])
 }
 
 // Form Builder Model
@@ -205,6 +210,7 @@ model Form {
   submissions   FormSubmission[]
   
   @@map("forms")
+  @@index([businessId])
 }
 
 // Form Submission Model
@@ -233,6 +239,8 @@ model FormSubmission {
   booking       Booking? @relation(fields: [bookingId], references: [id])
   
   @@map("form_submissions")
+  @@index([formId])
+  @@index([status])
 }
 
 // Inventory Model
@@ -261,6 +269,7 @@ model InventoryItem {
   serviceUsage  ServiceInventory[]
   
   @@map("inventory_items")
+  @@index([businessId])
 }
 
 // Service-Inventory Junction
@@ -301,6 +310,7 @@ model Conversation {
   messages      Message[]
   
   @@map("conversations")
+  @@index([businessId])
 }
 
 // Message Model
@@ -340,6 +350,8 @@ model Message {
   conversation  Conversation? @relation(fields: [conversationId], references: [id])
   
   @@map("messages")
+  @@index([conversationId])
+  @@index([businessId])
 }
 
 // Automation Model
