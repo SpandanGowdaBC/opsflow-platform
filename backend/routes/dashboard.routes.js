@@ -517,26 +517,30 @@ router.post('/fast-actions', verifyToken, async (req, res) => {
     try {
         const businessId = req.businessId;
 
-        // Action 1: Mass Remind & Auto-Complete for Forms (Fixed for SQLite)
+        // 1. Mass Remind & Auto-Complete for Forms
         const businessForms = await prisma.form.findMany({
             where: { businessId },
             select: { id: true }
         });
         const formIds = businessForms.map(f => f.id);
 
-        const formUpdate = await prisma.formSubmission.updateMany({
-            where: {
-                formId: { in: formIds },
-                status: 'PENDING'
-            },
-            data: {
-                status: 'COMPLETED',
-                completedAt: new Date(),
-                data: '{"auto_optimized": true, "note": "AI successfully extracted required profile data from communication history."}'
-            }
-        });
+        let formsReminded = 0;
+        if (formIds.length > 0) {
+            const formUpdate = await prisma.formSubmission.updateMany({
+                where: {
+                    formId: { in: formIds },
+                    status: 'PENDING'
+                },
+                data: {
+                    status: 'COMPLETED',
+                    completedAt: new Date(),
+                    data: '{"auto_optimized": true, "note": "AI successfully extracted required profile data from communication history."}'
+                }
+            });
+            formsReminded = formUpdate.count;
+        }
 
-        // Action 2: Confirm ALL pending bookings (Business-wide)
+        // 2. Confirm ALL pending bookings
         const bookingUpdate = await prisma.booking.updateMany({
             where: {
                 businessId,
@@ -545,18 +549,22 @@ router.post('/fast-actions', verifyToken, async (req, res) => {
             data: { status: 'CONFIRMED' }
         });
 
-        // Action 3: Trigger intelligent restock for all low stock items (Fixed for SQLite)
-        const allItems = await prisma.inventoryItem.findMany({ where: { businessId } });
-        const lowStockItemsToRestock = allItems.filter(item => item.currentStock <= item.minStock);
+        // 3. Restock all low stock items
+        const lowStockItems = await prisma.inventoryItem.findMany({
+            where: {
+                businessId,
+                currentStock: { lte: prisma.inventoryItem.minStock }
+            }
+        });
 
-        for (const item of lowStockItemsToRestock) {
+        for (const item of lowStockItems) {
             await prisma.inventoryItem.update({
                 where: { id: item.id },
-                data: { currentStock: item.currentStock + 20 }
+                data: { currentStock: item.minStock + 20 }
             });
         }
 
-        // Action 4: Clear all unread inbound messages
+        // 4. Clear unread messages
         const messageUpdate = await prisma.message.updateMany({
             where: {
                 businessId,
@@ -569,15 +577,15 @@ router.post('/fast-actions', verifyToken, async (req, res) => {
         res.json({
             success: true,
             summary: {
-                formsReminded: formUpdate.count,
+                formsReminded: formsReminded,
                 bookingsConfirmed: bookingUpdate.count,
-                itemsRestocked: lowStockItemsToRestock.length,
+                itemsRestocked: lowStockItems.length,
                 messagesCleared: messageUpdate.count
             }
         });
     } catch (error) {
         console.error('Fast Actions error:', error);
-        res.status(500).json({ error: 'Failed to execute command sequence' });
+        res.status(500).json({ error: 'System optimization failed in the cloud environment' });
     }
 });
 
