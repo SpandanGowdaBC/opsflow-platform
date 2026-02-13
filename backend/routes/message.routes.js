@@ -131,6 +131,44 @@ router.post('/conversations/:id/toggle-automation', verifyToken, async (req, res
     }
 });
 
+// 5. Get or Create Conversation (Deep Link from Lead/Booking)
+router.post('/find-or-create', verifyToken, async (req, res) => {
+    try {
+        const { email, name, phone } = req.body;
+        const businessId = req.businessId;
+
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required to link conversation' });
+        }
+
+        // 1. Try to find existing
+        let conversation = await prisma.conversation.findFirst({
+            where: {
+                businessId,
+                contactEmail: email
+            }
+        });
+
+        // 2. Create if not exists
+        if (!conversation) {
+            conversation = await prisma.conversation.create({
+                data: {
+                    businessId,
+                    contactEmail: email,
+                    contactName: name,
+                    contactPhone: phone,
+                    lastMessageAt: new Date()
+                }
+            });
+        }
+
+        res.json(conversation);
+    } catch (error) {
+        console.error('Find or create conversation error:', error);
+        res.status(500).json({ error: 'System communication failure' });
+    }
+});
+
 // Generate AI Draft Reply
 const aiService = require('../services/ai.service');
 router.post('/conversations/:id/ai-draft', verifyToken, async (req, res) => {
