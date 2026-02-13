@@ -111,7 +111,13 @@ export const servicesAPI = {
 
 // Leads API
 export const leadsAPI = {
-    getAll: () => apiClient.get('/api/leads'),
+    getAll: (params?: { status?: string }) => {
+        let url = '/api/leads';
+        if (params?.status) {
+            url += `?status=${params.status}`;
+        }
+        return apiClient.get(url);
+    },
     getById: (id: string) => apiClient.get(`/api/leads/${id}`),
     create: (data: any) => apiClient.post('/api/leads', data),
     update: (id: string, data: any) => apiClient.put(`/api/leads/${id}`, data),
