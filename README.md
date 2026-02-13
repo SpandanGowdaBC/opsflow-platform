@@ -1,94 +1,93 @@
-# 🚀 OpsFlow - The Unified AI Operations Platform
+# <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Rocket.png" alt="Rocket" width="40" height="40" /> OpsFlow 
 
-> **Engineered for the CareOps Hackathon 2026**
->
-> *Eliminating tool chaos with a single, intelligent operating system for service businesses.*
+### **The Unified AI Operations Platform**
+*Transforming service-based business operations with intelligent automation and real-time insights.*
 
----
+<div align="center">
 
-## 👨‍💻 Author
-**Spandan Gowda B C**
-*Full-Stack Developer & CareOps Innovator*
-[GitHub Profile](https://github.com/SpandanGowdaBC)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Now-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://opsflow-platform.vercel.app)
+[![Tech Stack](https://img.shields.io/badge/Stack-Next.js_14_%7C_Node.js_%7C_PostgreSQL-0070f3?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://github.com/SpandanGowdaBC/opsflow-platform)
+[![CareOps Hackathon](https://img.shields.io/badge/Hackathon-CareOps_2026-6d28d9?style=for-the-badge&logo=google&logoColor=white)](https://t.me/+aHXf5zBd1-Y2MWM9)
 
----
-
-## 📽️ Final Submission
-- **Demo Video:** [Watch on Loom](https://www.loom.com/share/6331b96f771449378ff6cd4cc17f84d5)
-- **Live Deployment:** [https://opsflow-platform.vercel.app](https://opsflow-platform.vercel.app)
-- **Demo Credentials:** `admin@zencare.com` / `password123`
-- **AI Leverage:** Powered by **Google Gemini** for Smart Communications
-- **Documentation:**
-  - [✨ Detailed Features](./docs/FEATURES.md)
-  - [🚀 Deployment Guide](./docs/DEPLOYMENT.md)
-  - [🗄️ Database Architecture](./docs/DATABASE.md)
+</div>
 
 ---
 
-## 🎯 The Vision
-OpsFlow isn't just another CRM. It's a **Recursive Fulfillment Loop**. It bridges the gap between customer acquisition (Leads), service delivery (Bookings), compliance (Forms), and logistics (Inventory) into one seamless, automated experience.
-
-## ✨ Core Innovation Pillars
-
-### 1. 🤖 AI-Powered "Hybrid" Unified Inbox
-Staff members shouldn't spend all day typing repetitive replies.
-- **✨ AI Smart Suggest:** One-click contextual drafts powered by Gemini.
-- **🛡️ Automation Guardrails:** AI intelligently steps back when staff intervenes to preserve the human touch.
-
-### 2. 🔄 The Fulfillment Ledger
-We moved beyond "just a calendar" to a dedicated **Booking Ledger**.
-- **✅ Completion Tracking:** Staff can mark bookings as fulfilled, instantly feeding business KPIs.
-- **🚩 Automated Recovery:** Marking a no-show triggers immediate re-engagement workflows.
-
-### 3. 📦 Logistics-Aware Scheduling
-Bookings aren't just about time; they are about resources.
-- **🚨 Low-Stock Alerts:** Automated alerts in the inbox when inventory breaches thresholds.
-- **📦 Asset Tracking:** Real-time visibility into the physical goods required for service.
+## 🌟 Overview
+**OpsFlow** is a modern operating system designed to eliminate "tool chaos" for service businesses. It unifies scattered workflows—leads, bookings, inventory, and real-time communications—into a single, high-performance dashboard powered by **Google Gemini AI**.
 
 ---
 
-## 🏛️ Technical Excellence
+## 🚀 Submission Details
+| Resource | Link |
+| :--- | :--- |
+| **🌍 Live App** | [opsflow-platform.vercel.app](https://opsflow-platform.vercel.app) |
+| **📽️ Demo Video** | [Watch on Loom](https://www.loom.com/share/6331b96f771449378ff6cd4cc17f84d5) |
+| **👨‍💻 Author** | [Spandan Gowda B C](https://github.com/SpandanGowdaBC) |
 
-### Stack Compatibility
-- **Frontend:** Next.js 14 (App Router) with a custom premium design system.
-- **Backend:** Node.js / Express with a modular service-oriented architecture.
-- **Database:** Prisma ORM with **PostgreSQL-native** schema (optimized for production).
-- **Integrations:** 
-  - **Email:** Nodemailer (SMTP + Ethereal)
-  - **SMS:** Twilio Integration
-  - **AI:** Google Gemini Intelligence Wrapper
+### 🔐 Demo Credentials
+> **Email:** `admin@zencare.com`  
+> **Password:** `password123`
 
 ---
 
-## 🛠️ Setup & Execution
+## ✨ Core Features
 
-### 1. Local Development (Zero-Config)
-The project is pre-seeded with **ZenCare Demo Data** for immediate testing.
+### 🤖 1. AI-Powered Unified Inbox
+*   **Contextual Intelligence:** Powered by **Google Gemini**, providing smart response suggestions.
+*   **Zero-Friction Communication:** Seamlessly manage client queries with AI-generated drafts tailored to business context.
+
+### 📊 2. Operational Intelligence (Dashboard)
+*   **Real-time Analytics:** Visibility into leads, bookings, and revenue metrics.
+*   **Live Updates:** Real-time data sync using Socket.IO for immediate operational awareness.
+
+### 📦 3. Smart Logistics & Inventory
+*   **Supply Chain Visibility:** Proactive tracking of equipment and supplies.
+*   **Automated Alerts:** Low-stock notifications and automated reorder workflows.
+
+### 📅 4. Strategic Command Center
+*   **Task Orchestration:** Advanced priority management for business leaders.
+*   **Seamless Coordination:** Bridge the gap between staff and clients effortlessly.
+
+---
+
+## 🛠️ Technical Architecture
+
+- **Frontend:** `Next.js 14`, `Tailwind CSS`, `Lucide React`, `Zustand`.
+- **Backend:** `Node.js`, `Express`, `Socket.IO`.
+- **Database:** `PostgreSQL` via `Prisma ORM`.
+- **AI Core:** `Google Gemini API` for smart automation.
+- **Deployment:** `Vercel` (Frontend), `Railway/Render` (Backend).
+
+---
+
+## ⚙️ Development Setup
+
+### **1. Backend Initialization**
 ```bash
-# Backend Setup
 cd backend
 npm install
 npx prisma db push
-node seed_zencare.js
+node seed_demo_data.js
 npm run dev
+```
 
-# Frontend Setup
-cd ../frontend
+### **2. Frontend Initialization**
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-### 2. Production Deployment (PostgreSQL + Docker)
-OpsFlow is fully architected for PostgreSQL and containerized for deployment.
-```bash
-docker-compose up --build
-```
-*(Please see [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed cloud instructions.)*
+---
+
+## 🏆 Innovation Edge
+OpsFlow transcends traditional project management. By positioning AI as an **operational assistant** rather than just a chatbot, it automates manual logistics and communication overhead, potentially reducing operational friction by **70%**.
 
 ---
 
-## 🏆 Final Note on AI Leverage
-During this hackathon, AI was leveraged as a **core product feature**. By integrating Gemini into the daily staff workflow (Smart Drafts), we've reduced operational friction by an estimated 70%, allowing small businesses to operate with the efficiency of a global enterprise.
+<div align="center">
+  <b>OpsFlow: See. Act. Operate.</b>  
+  <i>All from one dashboard.</i>
+</div>
 
----
-**OpsFlow**: See. Act. Operate. All from one dashboard.
