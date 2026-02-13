@@ -13,8 +13,9 @@
 ---
 
 ## 📽️ Final Submission
-- **Demo Video:** [Link to Demo]
-- **Deployment URL:** [Link to Live App]
+- **Demo Video:** [Watch on Loom](https://www.loom.com/share/6331b96f771449378ff6cd4cc17f84d5)
+- **Live Deployment:** [https://opsflow-platform.vercel.app](https://opsflow-platform.vercel.app)
+- **Demo Credentials:** `admin@zencare.com` / `password123`
 - **AI Leverage:** Powered by **Google Gemini** for Smart Communications
 - **Documentation:**
   - [✨ Detailed Features](./docs/FEATURES.md)
