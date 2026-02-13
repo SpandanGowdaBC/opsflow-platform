@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 function InboxContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
