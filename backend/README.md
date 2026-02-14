@@ -1,19 +1,27 @@
-# OpsFlow Backend
+# ⚙️ OpsFlow Backend
 
-This directory contains the backend services for **OpsFlow**, powered by Node.js and Express.
+The core intelligence and API layer of the OpsFlow platform.
 
-For full project documentation, setup instructions, and deployment details, please refer to the [Main README](../README.md).
+## 🚀 Tech Stack
+- **Node.js & Express**: API Framework.
+- **Prisma**: Type-safe database client.
+- **PostgreSQL**: Production database.
+- **Socket.IO**: Real-time events.
+- **Google Gemini**: AI Intelligence.
 
-## Quick Start
+## 🛠️ Development
 ```bash
 npm install
 npx prisma db push
+node seed_cloud_init.js
 node seed_demo_data.js
 npm run dev
 ```
 
-## Features
-- **Real-time Engine:** Socket.IO for live dashboard updates.
-- **AI Integration:** Google Gemini API for smart messaging and automation.
-- **Database:** Prisma ORM with PostgreSQL compatibility.
-- **REST API:** Robust endpoints for Lead & Booking management.
+## 🌐 API Structure
+- `/api/auth`: Authentication.
+- `/api/leads`: CRM & Lead tracking.
+- `/api/bookings`: Service orchestration.
+- `/api/inventory`: Logistics management.
+- `/api/tasks`: Command center operations.
+- `/api/ai`: Gemini intelligence wrappers.

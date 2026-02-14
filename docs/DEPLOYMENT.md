@@ -1,64 +1,55 @@
-# 🚀 Global Deployment Guide
+# 🚀 Global Deployment Guide - Render & Vercel
 
-This guide outlines how to deploy the **OpsFlow Unified Operations Platform** to a production environment. 
+This guide outlines the production deployment strategy for the **OpsFlow Unified Operations Platform**.
 
 ---
 
 ## 🏗️ Architecture Overview
-OpsFlow is built with a decoupled architecture:
-- **Frontend**: Next.js (App Router)
-- **Backend**: Node.js / Express
-- **Database**: PostgreSQL (via Prisma ORM)
+OpsFlow is built with a decoupled architecture for maximum scalability:
+- **Frontend**: Next.js (Deployed on Vercel)
+- **Backend**: Node.js / Express (Deployed on Render)
+- **Database**: PostgreSQL (Managed on Render)
 - **Real-time**: Socket.IO
 
 ---
 
-## ⚡ Option 1: The "Rapid" Deployment (Vercel + Railway)
-*Best for Hackathon submissions and quick demos.*
+## ⚡ Production Deployment (Step-by-Step)
 
-### 1. Database (Railway.app)
-1. Create a new PostgreSQL database on [Railway.app](https://railway.app/).
-2. Copy the **Public Connection String**.
-
-### 2. Backend (Render.com or Railway.app)
-1. Push your code to a GitHub repository.
-2. Link your repo to a new "Web Service" on **Render/Railway**.
-3. Set the following environment variables:
-   - `DATABASE_URL`: Your PostgreSQL connection string.
+### 1. Database & Backend (Render.com)
+1. **Create PostgreSQL Database**: 
+   - New -> PostgreSQL.
+   - Name: `opsflow-db`.
+   - Plan: Free (or higher).
+2. **Create Web Service**:
+   - New -> Web Service -> Connect GitHub Repository.
+   - **Name**: `opsflow-backend`.
+   - **Runtime**: Node.
+   - **Root Directory**: `backend`.
+   - **Build Command**: `npm install && npx prisma generate`.
+   - **Start Command**: `npx prisma db push && node seed_cloud_init.js && node seed_demo_data.js && node server.js`.
+3. **Environment Variables**:
+   - `DATABASE_URL`: Your PostgreSQL Internal Database URL.
    - `JWT_SECRET`: A secure random string.
-   - `FRONTEND_URL`: The URL of your deployed frontend.
-4. **Build Command**: `cd backend && npm install && npx prisma generate`
-5. **Start Command**: `cd backend && node server.js`
+   - `FRONTEND_URL`: Your Vercel deployment URL (e.g., `https://opsflow.vercel.app`).
+   - `NODE_ENV`: `production`.
 
-### 3. Frontend (Vercel)
-1. Link your repo to [Vercel](https://vercel.com/).
-2. Set the Environment Variable:
-   - `NEXT_PUBLIC_API_URL`: The URL of your deployed backend (e.g., `https://api.opsflow.com/api`).
-3. Vercel will automatically detect Next.js and deploy.
-
----
-
-## 🐳 Option 2: The "Enterprise" Deployment (Docker)
-*Best for VPS, DigitalOcean, or AWS EC2.*
-
-OpsFlow is fully Dockerized. To deploy on any Linux server:
-
-1. **Install Docker & Docker Compose** on your server.
-2. **Transfer the files** or clone your repository.
-3. **Launch the stack**:
-   ```bash
-   docker-compose up -d --build
-   ```
-   *This command will pull the Postgres image, build the Node.js backend, and serve the Next.js frontend on ports 5000 and 3000.*
+### 2. Frontend (Vercel)
+1. **Connect Repo**: New Project -> Import Repository.
+2. **Configure**:
+   - **Framework Preset**: Next.js.
+   - **Root Directory**: `frontend`.
+3. **Environment Variables**:
+   - `NEXT_PUBLIC_API_URL`: Your Render Web Service URL (e.g., `https://opsflow-backend.onrender.com`).
+4. **Deploy**: Vercel will build and host your Next.js application.
 
 ---
 
 ## 🔐 Critical Production Checklist
 
-1. **Prisma Schema**: Ensure `provider = "postgresql"` is set in `backend/prisma/schema.prisma` before deploying.
-2. **CORS**: Ensure the `FRONTEND_URL` in your backend `.env` matches your final deployed URL.
-3. **SSL**: Ensure you are using `https` for all API calls.
-4. **Database Migration**: Run `npx prisma db push` once against your production database to initialize the schema.
+1. **CORS Configuration**: Ensure the `FRONTEND_URL` in the Backend settings exactly matches your Vercel URL.
+2. **Prisma Generation**: Always run `npx prisma generate` in the build step to ensure the client is up to date.
+3. **Seeding**: The `seed_demo_data.js` script is used to populate the "Operational Brain" dashboard for demo purposes.
+4. **WebSockets**: Socket.IO is configured to work cross-origin between Render and Vercel.
 
 ---
 **OpsFlow**: Unified. Scalable. Production-Ready.

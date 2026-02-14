@@ -1,12 +1,22 @@
-# OpsFlow Frontend
+# 💻 OpsFlow Frontend
 
-This directory contains the frontend code for **OpsFlow**, built with Next.js 14.
+The unified command center for business operations.
 
-For full project documentation, setup instructions, and deployment details, please refer to the [Main README](../README.md).
+## 🚀 Tech Stack
+- **Next.js 14**: React framework with App Router.
+- **Tailwind CSS**: Premium styling and layout.
+- **Lucide React**: Modern iconography.
+- **Zustand**: Lightweight state management.
+- **Socket.IO Client**: Real-time notifications.
 
-## Quick Start
+## 🛠️ Development
 ```bash
 npm install
 npm run dev
 ```
 
+## 🏗️ Architecture
+- `/app`: Main application routes and pages.
+- `/lib/api.ts`: Centralized API client using `NEXT_PUBLIC_API_URL`.
+- `/store`: Global state management for auth and business context.
+- `/public`: Static assets and brand resources.

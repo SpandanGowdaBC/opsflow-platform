@@ -1,33 +1,46 @@
 # 🗄️ Database Architecture & Scalability
 
-OpsFlow is designed for extreme operational scale. While our local development environment uses SQLite for zero-config execution, the entire schema is **PostgreSQL-native** and optimized for production workloads.
+OpsFlow is designed for extreme operational scale. The entire schema is **PostgreSQL-native** and optimized for production workloads.
 
-## 🚀 PostgreSQL Readiness
-Our `prisma/schema.prisma` is architected to utilize PostgreSQL's advanced features:
-- **Relational Integrity**: Strict foreign key constraints across Leads, Bookings, and Inventory.
-- **Scalable Indexing**: Optimized lookups for real-time messaging and dashboard metrics.
-- **Concurrency**: Designed to handle simultaneous updates from the AI Optimization engine and manual staff interventions.
+---
 
-## 🛠️ How to Switch to PostgreSQL
-For the final production deployment, follow these two steps:
+## 🚀 PostgreSQL Architecture
+Our database schema is architected to utilize PostgreSQL's advanced features for service-business reliability:
 
-1. **Update Schema**:
-   In `backend/prisma/schema.prisma`, change the datasource provider:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
+1.  **Relational Integrity**: Strict foreign key constraints across Leads, Bookings, and Inventory models.
+2.  **Scalable Indexing**: Optimized lookups for real-time messaging, dashboard metrics, and fulfillment status.
+3.  **Concurrency Support**: Designed to handle simultaneous updates from the AI Optimization engine and manual staff interventions without data loss.
+4.  **Operational Resilience**: Every critical action—from a booking confirmation to an inventory alert—is ACID-compliant.
 
-2. **Configure Environment**:
-   Add your connection string to `backend/.env`:
+---
+
+## 🛠️ Database Setup
+
+### Production (Render)
+The production environment uses a managed PostgreSQL instance. The schema is pushed directly using Prisma:
+```bash
+npx prisma db push
+```
+
+### Local Development
+1. Ensure a local PostgreSQL instance is running.
+2. Configure your `DATABASE_URL` in `backend/.env`:
    ```env
    DATABASE_URL="postgresql://user:password@localhost:5432/opsflow_db"
    ```
-
-3. **Deploy**:
-   Run `npx prisma db push` to synchronize the schema with your Postgres instance.
+3. Run migrations or schema synchronization:
+   ```bash
+   npx prisma db push
+   ```
 
 ---
-*This architecture ensures that OpsFlow can grow from a single-clinic tool to a multi-national healthcare operating system without rewriting a single line of business logic.*
+
+## 📊 Data Models Summary
+- **Business**: Multi-tenant isolation for all records.
+- **Leads**: CRM layer with scoring and source tracking.
+- **Bookings**: The "Fulfillment Ledger" for service orchestration.
+- **Inventory**: Proactive logistics tracking with reorder logic.
+- **Conversations/Messages**: Real-time communication hub.
+
+---
+**OpsFlow**: Unified. Scalable. Data-Driven.
